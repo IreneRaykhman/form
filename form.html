@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация пользователя</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        label {
+            margin: 5px 0;
+            display: block;
+        }
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .radio-group label {
+            display: flex;
+            align-items: center;
+        }
+        .radio-group input {
+            margin-left: 10px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input {
+            margin-left: 10px;
+        }
+        .error {
+            color: red;
+            font-size: 0.8em;
+            display: none;
+        }
+        button {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+        button:hover:enabled {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Регистрация пользователя</h2>
+
+    <form id="registrationForm">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" name="name" placeholder="Введите ваше имя" required pattern="[A-Za-zА-Яа-яЁё\s]{2,20}">
+        <span id="nameError" class="error">Имя должно содержать только буквы и пробелы, длиной от 2 до 20 символов.</span>
+
+        <label for="email">Электронная почта:</label>
+        <input type="email" id="email" name="email" placeholder="Введите вашу электронную почту" required>
+        <span id="emailError" class="error">Введите корректный адрес электронной почты.</span>
+
+        <label for="age">Возраст:</label>
+        <input type="number" id="age" name="age" placeholder="Введите ваш возраст" required min="1">
+        <span id="ageError" class="error">Введите корректный возраст.</span>
+
+        <label>Пол:</label>
+        <div class="radio-group">
+            <label for="male">Мужчина
+                <input type="radio" id="male" name="gender" value="male" required>
+            </label>
+            <label for="female">Женщина
+                <input type="radio" id="female" name="gender" value="female" required>
+            </label>
+        </div>
+        <span id="genderError" class="error">Выберите пол.</span>
+
+        <label for="profession">Профессия:</label>
+        <select id="profession" name="profession" required>
+            <option value="" disabled selected>Выберите профессию</option>
+            <option value="doctor">Врач</option>
+            <option value="programmer">Программист</option>
+            <option value="teacher">Учитель</option>
+            <option value="designer">Дизайнер</option>
+            <option value="engineer">Инженер</option>
+            <option value="seller">Продавец</option>
+            <option value="other">Другое</option>
+        </select>
+        <span id="professionError" class="error">Выберите профессию.</span>
+
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" name="password" placeholder="Введите пароль" required minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}">
+        <span id="passwordError" class="error">Пароль должен содержать не менее 8 символов, включая одну заглавную букву, одну строчную букву и одну цифру.</span>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="agreement" name="agreement" required>
+            <label for="agreement">Я согласен с обработкой данных</label>
+        </div>
+        <span id="agreementError" class="error">Вы должны согласиться с условиями.</span>
+
+        <button type="submit" id="submitButton">Зарегистрироваться</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registrationForm');
+            const submitButton = document.getElementById('submitButton');
+            const inputs = form.querySelectorAll('input, select');
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                let isValid = true;
+
+                inputs.forEach(input => {
+                    if (!input.checkValidity()) {
+                        document.getElementById(`${input.id}Error`).style.display = 'block';
+                        isValid = false;
+                    } else {
+                        document.getElementById(`${input.id}Error`).style.display = 'none';
+                    }
+                });
+
+                if (isValid) {
+                    const formData = new FormData(form);
+                    console.log('Form Data:');
+                    for (const [name, value] of formData.entries()) {
+                        console.log(`${name}: ${value}`);
+                    }
+                    form.reset();
+                    submitButton.disabled = true;
+                }
+            });
+
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (input.checkValidity()) {
+                        document.getElementById(`${input.id}Error`).style.display = 'none';
+                    }
+                    checkFormValidity();
+                });
+
+                input.addEventListener('focus', function() {
+                    document.getElementById(`${input.id}Error`).style.display = 'none';
+                });
+
+                input.addEventListener('blur', function() {
+                    if (!input.checkValidity()) {
+                        document.getElementById(`${input.id}Error`).style.display = 'block';
+                    }
+                });
+            });
+
+            function checkFormValidity() {
+                let isValid = true;
+                inputs.forEach(input => {
+                    if (!input.checkValidity()) {
+                        isValid = false;
+                    }
+                });
+                submitButton.disabled = !isValid;
+            }
+        });
+    </script>
+
+</body>
+</html>
